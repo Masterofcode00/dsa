@@ -1,24 +1,29 @@
-#include<stdio.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-#include<stdlib.h>
-
+/* Function Declarations */
 void evaluate();
 void push(char);
 char pop();
 int prec(char);
 
+/* Global Variables */
 char infix[30], postfix[30], stack[30];
 int top = -1;
 
+/* Main Function */
 void main()
 {
-    printf("\n Enter the valid infix expression:");
+    printf("\nEnter the valid infix expression: ");
     scanf("%s", infix);
+
     evaluate();
-    printf("\nThe entered infix expression is :\n %s \n", infix);
-    printf("\nThe corresponding postfix expression is :\n %s \n", postfix);
+
+    printf("\nThe entered infix expression is:\n%s\n", infix);
+    printf("\nThe corresponding postfix expression is:\n%s\n", postfix);
 }
 
+/* Function to Convert Infix to Postfix */
 void evaluate()
 {
     int i = 0, j = 0;
@@ -29,6 +34,7 @@ void evaluate()
     for (i = 0; infix[i] != '\0'; i++)
     {
         symb = infix[i];
+
         switch (symb)
         {
         case '(':
@@ -39,11 +45,11 @@ void evaluate()
             temp = pop();
             while (temp != '(')
             {
-                postfix[j] = temp;
-                j++;
+                postfix[j++] = temp;
                 temp = pop();
             }
             break;
+
         case '+':
         case '-':
         case '*':
@@ -53,69 +59,49 @@ void evaluate()
         case '$':
             while (prec(stack[top]) >= prec(symb))
             {
-                temp = pop();
-                postfix[j] = temp;
-                j++;
+                postfix[j++] = pop();
             }
             push(symb);
             break;
+
         default:
-            postfix[j] = symb;
-            j++;
+            postfix[j++] = symb;
         }
     }
+
     while (top > 0)
-    {
-        temp = pop();
-        postfix[j] = temp;
-        j++;
-    }
+        postfix[j++] = pop();
+
     postfix[j] = '\0';
 }
 
+/* Push Operation */
 void push(char item)
 {
-    top = top + 1;
-    stack[top] = item;
+    stack[++top] = item;
 }
 
+/* Pop Operation */
 char pop()
 {
-    char item;
-    item = stack[top];
-    top = top - 1;
-    return item;
+    return stack[top--];
 }
 
+/* Precedence Function */
 int prec(char symb)
 {
-    int p;
     switch (symb)
     {
-    case '#':
-        p = -1;
-        break;
-
+    case '#': return -1;
     case '(':
-    case ')':
-        p = 0;
-        break;
-
+    case ')': return 0;
     case '+':
-    case '-':
-        p = 1;
-        break;
-
+    case '-': return 1;
     case '*':
     case '/':
-    case '%':
-        p = 2;
-        break;
-
+    case '%': return 2;
     case '^':
-    case '$':
-        p = 3;
-        break;
+    case '$': return 3;
     }
-    return p;
+    return 0;
 }
